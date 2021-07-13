@@ -97,7 +97,7 @@ function fn_change_dong_event() {
             return;
         }
 
-        var url = "/complexes/getAptInfo/" + dongCd;
+        var url = "/complexes/getAptList/" + dongCd;
 
         $.ajax({
             type: 'POST',
@@ -108,17 +108,28 @@ function fn_change_dong_event() {
 
                 $("#searchData").empty();
                 for (var i = 0; i < apt.length; i++) {
-                    var tr = "<tr>";
+                    var tr = "<tr id='" +apt[i].complexNo+ "'>";
                     tr += "<td>" + (apt.length-i) + "</td>";
                     tr += "<td>" + apt[i].complexName + "</td>";
                     tr += "<td>" + apt[i].cortarAddress + " " + apt[i].detailAddress + "</td>";
                     tr += "<td>" + apt[i].lowFloor + "/" + apt[i].highFloor + "</td>";
                     tr += "<td>" + apt[i].totalHouseholdCount + "</td>";
-                    tr += "<td>" + apt[i].useApproveYmd.substr(0, 4) + "-" + apt[i].useApproveYmd.substr(4, 2)  /*apt[i].useApproveYmd.substr(6, 2)*/ + "</td>";
+
+                    if(apt[i].useApproveYmd.length >= 4){
+                        tr += "<td>" + apt[i].useApproveYmd.substr(0, 4) + "-" + apt[i].useApproveYmd.substr(4, 2)  /*apt[i].useApproveYmd.substr(6, 2)*/ + "</td>";
+                    }else{
+                        tr += "<td>-</td>"
+                    }
+
                     tr += "</td>";
 
                     $("#searchData").append(tr);
                 }
+
+                $("#searchData tr").unbind("click").bind("click",function(){
+                    var aptCd = $(this).attr("id");
+                    fn_apt_click_event(aptCd);
+                });
 
             },
             error: function (data, status) {
@@ -127,9 +138,28 @@ function fn_change_dong_event() {
         })
     });
 }
+function fn_apt_click_event(aptCd){
+
+
+        var url = "/complexes/getAptInfo/" + aptCd;
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            dataType: 'json',
+            success: function (data, status, request) {
+
+                console.log(data);
+            },
+            error: function (data, status) {
+
+            }
+        })
+
+}
 function fn_loading_start(){
     var loading = '<div id="loading" style="position: absolute;width:100%;height:100%;top: 0;left: 0;">'
-                +'<img src="/assets/img/loading.gif" style="position:fixed;width:200px;left: calc(50% - 100px);top: calc(50% - 100px);">'
+                +'<img src="/assets/img/loading.gif" style="position:absolute;width:200px;left: calc(50% - 100px);top: calc(50% - 100px);">'
                 +'<div style="position:relative;width: 100%;height:100%;opacity:0.3;background-color: black">'
                 +'</div>'
                 +'</div>';
